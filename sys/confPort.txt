@@ -1,0 +1,2 @@
+port com12
+baudRate 115200

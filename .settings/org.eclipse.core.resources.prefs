@@ -1,0 +1,17 @@
+#Mon Jan 20 11:53:39 CST 2014
+eclipse.preferences.version=1
+encoding//Manager/DirectoryManager.py=utf8
+encoding//Printer/ConnectPort.py=utf8
+encoding//Printer/PrinterFactory.py=utf8
+encoding//Printer/bak.py=utf-8
+encoding//UI/DownloadDialog.py=utf8
+encoding//UI/DownloadDialogUI.py=utf-8
+encoding//UI/DownloadListDialog.py=utf8
+encoding//UI/DownloadListDialogUI.py=utf-8
+encoding//UI/PrintDialog.py=utf8
+encoding//UI/PrintDialogUI.py=utf-8
+encoding//UI/mainWindow.py=utf-8
+encoding//download/DownloadURL.py=utf8
+encoding//test/http.py=utf8
+encoding//util/File_U.py=utf8
+encoding/setup.py=utf-8
