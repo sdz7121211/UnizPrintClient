@@ -17,6 +17,6 @@ setup(
 #	  }
 #	  , 
 
-windows=['OneClickPrint.py']
+windows=['Main/WebBrowerse.py']
 #console=['OneClickPrint.py']
 )
