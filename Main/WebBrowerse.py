@@ -1,137 +1,105 @@
-'''
-Created on 2014-1-20
+# 2014.01.20 23:20:45 中国标准时间
+#Embedded file name: WebClient\WebBrowerse.pyc
+"""
+Created on 2014-1-12
 
 @author: sdz
-'''
+"""
 from PyQt4 import QtGui
-from PyQt4 import QtCore
-from PyQt4 import QtWebKit
 from UI import mainWindow
-from util_U import File_U
-from Agent import Agent
-from Manager import DirectoryManager
-
-from Manager import GlobalVariable
-
-from UI import DownloadListDialog
+from PyQt4 import QtCore
+import PyQt4
+from PyQt4 import QtWebKit
 from UI import DownloadDialog
-
+from UI import DownloadListDialog
+from util import File_U
+import sys
+import sip
 
 class MainWindow(QtGui.QMainWindow):
-    '''
-    classdocs
-    '''
-
 
     def __init__(self):
-        '''
-        Constructor
-        '''
         super(MainWindow, self).__init__()
         self._loadUI()
         self.setCentralWidget(self.ui.webView)
-        self.initToolbar()
-        self.initHomePage()
-        self.initWebView()
-        
-    
-        
-    def initHomePage(self):
-        self.ui.webView.setUrl(QtCore.QUrl(GlobalVariable.HomePage))
-        
-    def initToolbar(self):
-        import os
-        updir = File_U.convertPathSlish(os.getcwd())
-        self.toolBar = QtGui.QToolBar(self)
-        self.toolBar.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
-        self.addToolBar(QtCore.Qt.TopToolBarArea, self.toolBar)
-        
-        self.homeClick = QtGui.QAction(self)
-        self.homeIcon = QtGui.QIcon()
-        self.homeIcon.addPixmap(QtGui.QPixmap(updir + "/icon/homepage.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.homeClick.setIcon(self.homeIcon)
-        Agent.Agent().noticeToReceiver(self.homeClick.triggered, self.homeClickAction)
+        self.ui.webView.load(QtCore.QUrl(mainWindow._fromUtf8('http://www.uniz.cc/modelview/')))
+        self.setWindowIcon(QtGui.QIcon(QtGui.QPixmap('../icon/main_big.png')))
+        self.setWindowTitle(mainWindow._fromUtf8('Uniz Software - Model View'))
+        self.setStatusBar(QtGui.QStatusBar(self))
+        self.statusBar().showMessage(mainWindow._fromUtf8('Uniz Software - Model View'))
+        self._initToolbar()
+        self._connectWebViewLinkClicked()
+        sip.setdestroyonexit(False)
 
-        self.refeshClick = QtGui.QAction(self)
-        self.refeshIcon = QtGui.QIcon()
-        self.refeshIcon.addPixmap(QtGui.QPixmap(updir + "/icon/refesh.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.refeshClick.setIcon(self.refeshIcon)
-        Agent.Agent().noticeToReceiver(self.refeshClick.triggered, self.reflashClickAction)
-        
-        self.preClick = QtGui.QAction(self)
-        self.preIcon = QtGui.QIcon()
-        self.preIcon.addPixmap(QtGui.QPixmap(updir + "/icon/forward.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.preClick.setIcon(self.preIcon)       
-        Agent.Agent().noticeToReceiver(self.preClick.triggered, self.preClickAction)
-        
-        self.backClick = QtGui.QAction(self)
-        self.backIcon = QtGui.QIcon()
-        self.backIcon.addPixmap(QtGui.QPixmap(updir + "/icon/back.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.backClick.setIcon(self.backIcon)       
-        Agent.Agent().noticeToReceiver(self.backClick.triggered, self.backClickAction)
-
-        self.downloadListClick = QtGui.QAction(self)
-        self.downloadListIcon = QtGui.QIcon()
-        self.downloadListIcon.addPixmap(QtGui.QPixmap(updir + "/icon/download.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.downloadListClick.setIcon(self.downloadListIcon)       
-        Agent.Agent().noticeToReceiver(self.downloadListClick.triggered, self.downloadListClickAction)
-        
-        
-        self.toolBar.addAction(self.homeClick)
-        self.toolBar.addAction(self.refeshClick)
-        self.toolBar.addAction(self.preClick)
-        self.toolBar.addAction(self.backClick)
-        self.toolBar.addAction(self.downloadListClick)
-        
-    
-    def initWebView(self):
-        self.ui.webView.linkClicked.connect(self.clickLinkAction)
-        self.ui.webView.page().setLinkDelegationPolicy(QtWebKit.QWebPage.DelegateAllLinks)
-        
-    
-    def clickLinkAction(self, qurl):
-        
-        url = File_U._fromUtf8(qurl.toString() )
-        if str(url).endswith(".7z"):
-            dd = DownloadDialog.DownloadDialog(self)
-            dd.ui.label_url.setText(url)
-            dd.show()
-        else:
-            self.ui.webView.setUrl(qurl)
-        
-    
-        
     def _loadUI(self):
-        
-        self.ui = mainWindow.Ui_mainWindow()         
+        self.ui = mainWindow.Ui_mainWindow()
         self.ui.setupUi(self)
-                
-    def homeClickAction(self):
-        self.ui.webView.setUrl(QtCore.QUrl(GlobalVariable.HomePage))
-    
-    def reflashClickAction(self):
-        self.ui.webView.reload()
-    
-    def preClickAction(self):
+
+    def _initToolbar(self):
+        self.toolbar = QtGui.QToolBar(self)
+        self.setToolButtonStyle(QtCore.Qt.ToolButtonTextBesideIcon)
+        self.homepageActionItem = self._initToobarItem('../icon/homepage.png')
+        self.forwardActionItem = self._initToobarItem('../icon/forward.png')
+        self.backActionItem = self._initToobarItem('../icon/back.png')
+        self.refeshActionItem = self._initToobarItem('../icon/download.png')
+        self.downloadActionItem = self._initToobarItem('../icon/download.png')
+        self.connect(self.homepageActionItem, QtCore.SIGNAL(mainWindow._fromUtf8('triggered()')), self.homepageClickAction)
+        self.connect(self.forwardActionItem, QtCore.SIGNAL(mainWindow._fromUtf8('triggered()')), self.forwardClickAction)
+        self.connect(self.backActionItem, QtCore.SIGNAL(mainWindow._fromUtf8('triggered()')), self.backClickAction)
+        self.connect(self.refeshActionItem, QtCore.SIGNAL(mainWindow._fromUtf8('triggered()')), self.refeshClickAction)
+        self.connect(self.downloadActionItem, QtCore.SIGNAL(mainWindow._fromUtf8('triggered()')), self.downloadListClickAction)
+        self.toolbar.addAction(self.homepageActionItem)
+        self.toolbar.addAction(self.forwardActionItem)
+        self.toolbar.addAction(self.backActionItem)
+        self.toolbar.addAction(self.refeshActionItem)
+        self.toolbar.addAction(self.downloadActionItem)
+        self.addToolBar(QtCore.Qt.LeftToolBarArea, self.toolbar)
+
+    def _connectWebViewLinkClicked(self):
+        self.ui.webView.page().setLinkDelegationPolicy(QtWebKit.QWebPage.DelegateAllLinks)
+        QtCore.QObject.connect(self.ui.webView, QtCore.SIGNAL(mainWindow._fromUtf8('linkClicked(QUrl)')), self.clickUrlAction)
+
+    def homepageClickAction(self):
+        self.ui.webView.setUrl(QtCore.QUrl(mainWindow._fromUtf8('http://www.uniz.cc/modelview/')))
+
+    def forwardClickAction(self):
         self.ui.webView.forward()
-        
+
     def backClickAction(self):
         self.ui.webView.back()
-    
-    def downloadListClickAction(self):
-        modelList = File_U.getAllFile(DirectoryManager.getDownloadFilePath())
-        dl = DownloadListDialog.DownloadListDialog(self)
-        dl.fillTableWidget(modelList)
-        dl.show()
-        
-        
-    
 
-    
-        
-if __name__ == "__main__":
-    import sys
+    def refeshClickAction(self):
+        self.ui.webView.reload()
+
+    def downloadListClickAction(self):
+        filelist = File_U.getAllFile(File_U.getCurrentUpDirPath() + '/temp')
+        downloadlistDialog = DownloadListDialog.DownloadListDialog(self)
+        downloadlistDialog.fillTableWidget(filelist)
+        downloadlistDialog.show()
+
+    @PyQt4.QtCore.pyqtSlot(QtCore.QUrl)
+    def clickUrlAction(self, url):
+        url_str = File_U._fromUtf8(url.toString())
+        if not str(url_str).endswith('.7z'):
+            self.ui.webView.setUrl(url)
+        else:
+            dd = DownloadDialog.DownloadDialog(self)
+            dd.show()
+            dd.ui.label_url.setText(url.toString())
+
+    def _initToobarItem(self, img_path):
+        item_action = QtGui.QAction(self)
+        item_icon = QtGui.QIcon()
+        item_icon.addPixmap(QtGui.QPixmap(img_path), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        item_action.setIcon(item_icon)
+        return item_action
+
+    def closeEvent(self, closeEvent):
+        self.close()
+
+
+if __name__ == '__main__':
     app = QtGui.QApplication(sys.argv)
-    tested = MainWindow()
-    tested.show()
+    main = MainWindow()
+    main.show()
     app.exec_()
